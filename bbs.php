@@ -1,6 +1,9 @@
 <?php
 require_once './function.php';
-$result = [];
+$result = [
+    'name' => true,
+    'comment' => true
+];
 $fh = openFile();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // validation処理
@@ -19,6 +22,11 @@ closeFile($fh);
     <head>
         <title>Formサンプル</title>
     </head>
+    <style>
+        .error-text {
+            color: red;
+        }
+    </style>
     <body>
         <h1>BBS</h1>
         <form action="/bbs.php" method="POST">
@@ -27,6 +35,9 @@ closeFile($fh);
                 <label for="name">名前：
                     <input type="text" id="name" name="name">
                 </label>
+                <?php if($result['name'] === false): ?>
+                    <p class="error-text">入力できるのは英数のみ3文字以上32文字以下です</p>
+                <?php endif; ?>
             </div>
             <br>
             <!-- コメント -->
@@ -34,6 +45,9 @@ closeFile($fh);
                 <label for="comment">コメント：
                     <textarea name="comment" id="comment" cols="0" rows="5"></textarea>
                 </label>
+                <?php if($result['comment'] === false): ?>
+                    <p class="error-text">入力は1024文字までです。</p>
+                <?php endif; ?>
             </div>
             <!-- 画像は後で -->
             <br>
