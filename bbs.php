@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once './function.php';
 $result = [
     'name' => true,
@@ -35,8 +34,8 @@ closeFile($fh);
             <form action="/bbs.php" method="POST">
                 <!-- 名前 -->
                 <div>
-                    <label for="name">名前：
-                        <input type="text" id="name" name="name">
+                    <label for="name">
+                        名前：<input type="text" id="name" name="name" value="<?php echo $_SESSION['login']; ?>" />
                     </label>
                     <?php if($result['name'] === false): ?>
                         <p class="error-text">入力できるのは英数のみ3文字以上32文字以下です</p>
@@ -45,8 +44,8 @@ closeFile($fh);
                 <br>
                 <!-- コメント -->
                 <div>
-                    <label for="comment">コメント：
-                        <textarea name="comment" id="comment" cols="0" rows="5"></textarea>
+                    <label for="comment">
+                        コメント：<textarea name="comment" id="comment" cols="0" rows="5"></textarea>
                     </label>
                     <?php if($result['comment'] === false): ?>
                         <p class="error-text">入力は1024文字までです。</p>
