@@ -4,16 +4,30 @@ define('COMMENT_FILE', './bbs/comment.txt');
 define('ACCOUNT_FILE', './bbs/account.csv');
 session_start();
 
-function checkLogin($id, $password) {
-
-    // account.csvを開く
+function getAccountWithFile() {
     $fh = openFile(ACCOUNT_FILE);
-
-    // fileの中身を全て取得して配列にする
     $accounts = getAccounts($fh);
     closeFile($fh);
+    return $accounts;
+}
 
+function checkLogin($id, $password) {
+    $accounts = getAccountWithFile();
     return existsAccount($accounts, $id, $password);
+}
+
+function checkDeplicateAccount($id) {
+    $accounts = getAccountWithFile();
+    return existsAccountId($accounts, $id);
+}
+
+function existsAccountId($accounts, $id) {
+    foreach($accounts as $account) {
+        if($account['id'] === $id) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function existsAccount($accounts, $id, $password) {
@@ -57,6 +71,14 @@ function validationPost($name, $comment) {
     }
 
     return $result;
+}
+
+function saveAccount($id, $password) {
+    $fh = openFile(ACCOUNT_FILE);
+    if(fputcsv($fh, [$id, password_hash($password, PASSWORD_BCRYPT)]) === false) {
+        // @todo エラーハンドリングをもっとまじめにするよ
+        echo "やばいよ！";
+    }
 }
 
 function requestPost($fh) {
