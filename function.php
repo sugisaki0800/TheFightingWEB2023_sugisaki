@@ -2,18 +2,43 @@
 
 define('COMMENT_FILE', './bbs/comment.txt');
 define('ACCOUNT_FILE', './bbs/account.csv');
+define('BBS_ID_FILE', './bbs/bbs_id.txt');
 session_start();
 
-function checkLogin($id, $password) {
-
-    // account.csvを開く
+function getAccountWithFile() {
     $fh = openFile(ACCOUNT_FILE);
-
-    // fileの中身を全て取得して配列にする
     $accounts = getAccounts($fh);
     closeFile($fh);
+    return $accounts;
+}
 
+function checkLogin($id, $password) {
+    $accounts = getAccountWithFile();
     return existsAccount($accounts, $id, $password);
+}
+
+function findAccount($id) {
+    $accounts = getAccountWithFile();
+    foreach($accounts as $account) {
+        if($account['id'] === $id) {
+            return $account;
+        }
+    }
+    return null;
+}
+
+function checkDeplicateAccount($id) {
+    $accounts = getAccountWithFile();
+    return existsAccountId($accounts, $id);
+}
+
+function existsAccountId($accounts, $id) {
+    foreach($accounts as $account) {
+        if($account['id'] === $id) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function existsAccount($accounts, $id, $password) {
@@ -28,12 +53,12 @@ function existsAccount($accounts, $id, $password) {
     return false;
 }
 
-function openFile($fileName) {
+function openFile($fileName, $mode = 'a+') {
     if (!file_exists($fileName)) {
         touch($fileName);
         chmod($fileName, 0777);
     }
-    return fopen($fileName, 'a+');
+    return fopen($fileName, $mode);
 }
 
 function closeFile($fh) {
@@ -59,12 +84,22 @@ function validationPost($name, $comment) {
     return $result;
 }
 
+function saveAccount($id, $password, $is_admin) {
+    $fh = openFile(ACCOUNT_FILE);
+    if(fputcsv($fh, [$id, password_hash($password, PASSWORD_BCRYPT), $is_admin ? 1 : 0]) === false) {
+        // @todo エラーハンドリングをもっとまじめにするよ
+        echo "やばいよ！";
+    }
+}
+
 function requestPost($fh) {
     $date = time();
 
-    if(fputcsv($fh, [$_POST['name'], $_POST['comment'], $date]) === false) {
+    if(fputcsv($fh, [getBbsNextId(), $_POST['name'], $_POST['comment'], $date]) === false) {
         // @todo エラーハンドリングをもっとまじめにするよ
         echo "やばいよ！";
+    } else {
+        setLastId();
     }
 }
 
@@ -74,7 +109,8 @@ function getAccounts($fh) {
     while (($buffer = fgetcsv($fh, 4096)) !== false) {
         $accountArray[] = [
             'id' => $buffer[0],
-            'pass' => $buffer[1]
+            'pass' => $buffer[1],
+            'isAdmin' => $buffer[2]
         ];
     }
     return $accountArray;
@@ -85,10 +121,45 @@ function getBbs($fh) {
     rewind($fh);
     while (($buffer = fgetcsv($fh, 4096)) !== false) {
         $bbsArray[] = [
-            'name' => $buffer[0],
-            'comment' => $buffer[1],
-            'date' => $buffer[2]
+            'id' => $buffer[0],
+            'name' => $buffer[1],
+            'comment' => $buffer[2],
+            'date' => $buffer[3]
         ];
     }
     return $bbsArray;
+}
+
+function deleteBbs($id) {
+    $fh = openFile(COMMENT_FILE);
+    $bbs = getBbs($fh);
+    closeFile($fh);
+
+    $fh = openFile(COMMENT_FILE, 'w');
+    foreach($bbs as $record) {
+        if($record['id'] != $id) {
+            if(fputcsv($fh, [$record['id'], $record['name'], $record['comment'], $record['date']]) === false) {
+                echo "やばいよ！";
+            }
+        }
+    }
+    fwrite($fh, $id);
+    closeFile($fh);
+}
+
+function getBbsLastId() {
+    $fh = openFile(BBS_ID_FILE);
+    $id = fgets($fh);
+    closeFile($fh);
+    return (int)$id;
+}
+function getBbsNextId() {
+    $id = getBbsLastId();
+    return $id + 1;
+}
+function setLastId() {
+    $id = getBbsNextId();
+    $fh = openFile(BBS_ID_FILE, 'w');
+    fwrite($fh, $id);
+    closeFile($fh);
 }
