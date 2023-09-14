@@ -55,7 +55,6 @@ closeFile($fh);
                         <p class="error-text">入力は1024文字までです。</p>
                     <?php endif; ?>
                 </div>
-                <!-- 画像は後で -->
                 <br>
                 <input type="submit" value="送信">
             </form>
@@ -85,9 +84,18 @@ closeFile($fh);
             foreach($bbs as $item):
             ?>
                 <div>
-                    <p>nama: <?php echo $item['name']; ?></p>
+                    <p>name: <?php echo $item['name']; ?></p>
                     <p>comment: <?php echo str_replace(PHP_EOL, '<br>', $item['comment']); ?></p>
                     <p>date time: <?php echo date('Y/m/d H:i:s', $item['date']); ?></p>
+                    <?php if($_SESSION['isAdmin']): ?>
+                        <form action="delete.php" method="POST">
+                            <div>
+                                <input type="submit" value="削除する" />
+                                <input type="hidden" name="bbs_id" value="<?php echo $item['id']; ?>" />
+                            </div>
+
+                        </form>
+                    <?php endif; ?>
                 </div>
                 <hr />
             <?php
