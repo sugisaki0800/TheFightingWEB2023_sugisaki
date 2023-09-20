@@ -3,16 +3,20 @@ require_once './function.php';
 
 // POSTをされたかどうか
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
+  $pdo = dbConnect();
   // @todo validation check
 
   // account情報とPOSTの情報が一致するかどうか
-  $result = checkLogin($_POST['id'], $_POST['password']);
+  $account = checkLogin($pdo, $_POST['name'], $_POST['password']);
 
-  if ($result) {
-    $account = findAccount($_POST['id']);
-    // 一致した場合には、ログイン状態にする
-    $_SESSION['login'] = $account['id'];
-    $_SESSION['isAdmin'] = ($account['isAdmin'] == 1);
+  if ($account) {
+    $_SESSION['account'] = $account;
+    // $account = findAccount($pdo, $_POST['name']);
+    // var_dump($account);
+    // // 一致した場合には、ログイン状態にする
+    // $_SESSION['account'] = $account;
+    // $_SESSION['login'] = $account['name'];
+    // $_SESSION['isAdmin'] = ($account['isAdmin'] == 1);
   }
 }
 header('Location: /bbs.php');

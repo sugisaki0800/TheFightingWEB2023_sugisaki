@@ -1,45 +1,57 @@
 <?php
 
 define('COMMENT_FILE', './bbs/comment.txt');
-define('ACCOUNT_FILE', './bbs/account.csv');
+// define('ACCOUNT_FILE', './bbs/account.csv');
 define('BBS_ID_FILE', './bbs/bbs_id.txt');
 session_start();
 
-function getAccountWithFile() {
-    $fh = openFile(ACCOUNT_FILE);
-    $accounts = getAccounts($fh);
-    closeFile($fh);
-    return $accounts;
+// function getAccountWithFile() {
+//     $fh = openFile(ACCOUNT_FILE);
+//     $accounts = getAccounts($fh);
+//     closeFile($fh);
+//     return $accounts;
+// }
+
+function checkLogin($pdo, $id, $password) {
+    $account = findAccountByName($pdo, $id);
+    var_dump($account);
+    return !empty($account) && password_verify($password, $account['password']) ? $account : false;
+    // $accounts = getAccountWithFile();
+    // return existsAccount($accounts, $id, $password);
 }
 
-function checkLogin($id, $password) {
-    $accounts = getAccountWithFile();
-    return existsAccount($accounts, $id, $password);
+function findAccountByName($pdo, $id) {
+    $sth = $pdo->prepare("SELECT * FROM accounts WHERE `name` = ?");
+    $sth->execute([$id]);
+    return $sth->fetch();
+}
+// function findAccount($id) {
+//     $accounts = getAccountWithFile();
+//     foreach($accounts as $account) {
+//         if($account['id'] === $id) {
+//             return $account;
+//         }
+//     }
+//     return null;
+// }
+
+function checkDeplicateAccount($pdo, $name) {
+    $sth = $pdo->prepare("SELECT * FROM accounts WHERE `name` = ?");
+    $sth->execute([$name]);
+    $result = $sth->fetchAll();
+    return count($result) === 0;
+    // $accounts = getAccountWithFile();
+    // return existsAccountId($accounts, $id);
 }
 
-function findAccount($id) {
-    $accounts = getAccountWithFile();
-    foreach($accounts as $account) {
-        if($account['id'] === $id) {
-            return $account;
-        }
-    }
-    return null;
-}
-
-function checkDeplicateAccount($id) {
-    $accounts = getAccountWithFile();
-    return existsAccountId($accounts, $id);
-}
-
-function existsAccountId($accounts, $id) {
-    foreach($accounts as $account) {
-        if($account['id'] === $id) {
-            return false;
-        }
-    }
-    return true;
-}
+// function existsAccountId($accounts, $id) {
+//     foreach($accounts as $account) {
+//         if($account['id'] === $id) {
+//             return false;
+//         }
+//     }
+//     return true;
+// }
 
 function existsAccount($accounts, $id, $password) {
     // 配列データをloopして、一致する情報があるかを判定する
@@ -84,12 +96,14 @@ function validationPost($name, $comment) {
     return $result;
 }
 
-function saveAccount($id, $password, $is_admin) {
-    $fh = openFile(ACCOUNT_FILE);
-    if(fputcsv($fh, [$id, password_hash($password, PASSWORD_BCRYPT), $is_admin ? 1 : 0]) === false) {
-        // @todo エラーハンドリングをもっとまじめにするよ
-        echo "やばいよ！";
-    }
+function saveAccount($pdo, $name, $password, $is_admin) {
+    $sth = $pdo->prepare("INSERT INTO `accounts` (`name`, `password`, admin_flag) VALUE(?, ?, ?)");
+    return $sth->execute([$name, password_hash($password, PASSWORD_BCRYPT), $is_admin ? 1 : 0]);
+    // $fh = openFile(ACCOUNT_FILE);
+    // if(fputcsv($fh, [$id, password_hash($password, PASSWORD_BCRYPT), $is_admin ? 1 : 0]) === false) {
+    //     // @todo エラーハンドリングをもっとまじめにするよ
+    //     echo "やばいよ！";
+    // }
 }
 
 function requestPost($fh) {
@@ -143,7 +157,7 @@ function deleteBbs($id) {
             }
         }
     }
-    fwrite($fh, $id);
+    // fwrite($fh, $id);
     closeFile($fh);
 }
 
@@ -162,4 +176,14 @@ function setLastId() {
     $fh = openFile(BBS_ID_FILE, 'w');
     fwrite($fh, $id);
     closeFile($fh);
+}
+
+function dbConnect() {
+    try {
+    $pdo = new PDO("mysql:host=mysql;dbname=bbs", 'root', 'root');
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    return $pdo;
+    } catch (PDOException $e) {
+        die("Database connection failed: " . $e->getMessage());
+    }
 }
