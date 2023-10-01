@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         requestPost($pdo);
     }
 }
-$bbs = getBbs($fh);
+$bbs = getBbs($pdo);
 closeFile($fh);
 
 ?>
@@ -32,6 +32,9 @@ closeFile($fh);
         }
     </style>
     <body>
+        <pre>
+            <?php var_dump($bbs); ?>
+        </pre>
         <h1>BBS</h1>
 
         <?php if ($_SESSION['account']): ?>
@@ -84,7 +87,7 @@ closeFile($fh);
                 <div>
                     <p>name: <?php echo $item['name']; ?></p>
                     <p>comment: <?php echo str_replace(PHP_EOL, '<br>', $item['comment']); ?></p>
-                    <p>date time: <?php echo date('Y/m/d H:i:s', $item['date']); ?></p>
+                    <p>date time: <?php echo $item['create_date']; ?></p>
                     <?php if($_SESSION['account']['admin_flag'] === 1): ?>
                         <form action="delete.php" method="POST">
                             <div>
