@@ -2,7 +2,7 @@
 
 define('COMMENT_FILE', './bbs/comment.txt');
 // define('ACCOUNT_FILE', './bbs/account.csv');
-define('BBS_ID_FILE', './bbs/bbs_id.txt');
+// define('BBS_ID_FILE', './bbs/bbs_id.txt');
 session_start();
 
 // function getAccountWithFile() {
@@ -14,7 +14,7 @@ session_start();
 
 function checkLogin($pdo, $id, $password) {
     $account = findAccountByName($pdo, $id);
-    var_dump($account);
+    // var_dump($account);
     return !empty($account) && password_verify($password, $account['password']) ? $account : false;
     // $accounts = getAccountWithFile();
     // return existsAccount($accounts, $id, $password);
@@ -77,16 +77,16 @@ function closeFile($fh) {
     fclose($fh);
 }
 
-function validationPost($name, $comment) {
+function validationPost($comment) {
     $result = [
-        'name' => true,
+        // 'name' => true,
         'comment' => true
     ];
 
     // name -> アルファベット(大文字/小文字)と数字のみ / 32文字までに制限 / 3文字以上
-    if (preg_match('/[A-Za-z0-9]{3,32}/', $name) !== 1) {
-        $result['name'] = false;
-    }
+    // if (preg_match('/[A-Za-z0-9]{3,32}/', $name) !== 1) {
+    //     $result['name'] = false;
+    // }
 
     // comment -> 1024文字(2のn乗です) / 許容する文字に制限は設けない
     if (mb_strlen($comment) > 1024) {
@@ -106,32 +106,74 @@ function saveAccount($pdo, $name, $password, $is_admin) {
     // }
 }
 
-function requestPost($fh) {
-    $date = time();
+function requestPost($pdo) {
+    $sth = $pdo->prepare("INSERT INTO `comments` (`account_id`, `comment`) VALUE(?, ?)");
+    return $sth->execute([$_SESSION['account']['id'], $_POST['comment']]);
+    // $date = time();
 
-    if(fputcsv($fh, [getBbsNextId(), $_POST['name'], $_POST['comment'], $date]) === false) {
-        // @todo エラーハンドリングをもっとまじめにするよ
-        echo "やばいよ！";
-    } else {
-        setLastId();
-    }
+    // if(fputcsv($fh, [getBbsNextId(), $_POST['name'], $_POST['comment'], $date]) === false) {
+    //     // @todo エラーハンドリングをもっとまじめにするよ
+    //     echo "やばいよ！";
+    // } else {
+    //     setLastId();
+    // }
 }
 
-function getAccounts($fh) {
-    $accountArray = [];
-    rewind($fh);
-    while (($buffer = fgetcsv($fh, 4096)) !== false) {
-        $accountArray[] = [
-            'id' => $buffer[0],
-            'pass' => $buffer[1],
-            'isAdmin' => $buffer[2]
-        ];
-    }
-    return $accountArray;
-}
+// function getAccounts($fh) {
+//     $accountArray = [];
+//     rewind($fh);
+//     while (($buffer = fgetcsv($fh, 4096)) !== false) {
+//         $accountArray[] = [
+//             'id' => $buffer[0],
+//             'pass' => $buffer[1],
+//             'isAdmin' => $buffer[2]
+//         ];
+//     }
+//     return $accountArray;
+// }
 
 function getBbs($fh) {
     $bbsArray = [];
+    try{
+        // （1）DBへ接続の準備
+        $dsn = 'mysql:dbname=bbs;host=localhost;charset=utf8';
+        $user = 'root';
+        $password = 'root';
+        $options = array(
+          // SQL実行失敗時には例外をスローしてくれる
+          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+          // カラム名をキーとする連想配列で取得する．これが一番ポピュラーな設定
+          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+          // バッファードクエリを使う(一度に結果セットをすべて取得し、サーバー負荷を軽減)
+          // SELECTで得た結果に対してもrowCountメソッドを使えるようにする
+          PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,);
+
+          // （2）PDOオブジェクトを生成してDB接続
+          $dbh = new PDO($dsn,$user,$password,$options);
+
+          $sql = 'SELECT * FROM comments as c LEFT JOIN accounts as a ON c.account_id = a.id';
+
+
+          $stmt = $dbh->query($sql);
+
+    // （5）取得結果をfetchを使って表示する
+    // クエリの結果が$stmtの中に入っている
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    // （6）結果があれば、print_rで表示。中身がなければ'結果なし'と表示
+    if(!empty($result)){
+      echo '<pre>';
+      var_dump($result);
+      echo '</pre>';
+    }else{
+      echo '結果なし';
+    }
+}catch(Exception $e){
+  error_log('エラー発生：' .$e->getMessage());
+}
+
+
     rewind($fh);
     while (($buffer = fgetcsv($fh, 4096)) !== false) {
         $bbsArray[] = [
@@ -145,6 +187,7 @@ function getBbs($fh) {
 }
 
 function deleteBbs($id) {
+    // @todo
     $fh = openFile(COMMENT_FILE);
     $bbs = getBbs($fh);
     closeFile($fh);
@@ -161,22 +204,22 @@ function deleteBbs($id) {
     closeFile($fh);
 }
 
-function getBbsLastId() {
-    $fh = openFile(BBS_ID_FILE);
-    $id = fgets($fh);
-    closeFile($fh);
-    return (int)$id;
-}
-function getBbsNextId() {
-    $id = getBbsLastId();
-    return $id + 1;
-}
-function setLastId() {
-    $id = getBbsNextId();
-    $fh = openFile(BBS_ID_FILE, 'w');
-    fwrite($fh, $id);
-    closeFile($fh);
-}
+// function getBbsLastId() {
+//     $fh = openFile(BBS_ID_FILE);
+//     $id = fgets($fh);
+//     closeFile($fh);
+//     return (int)$id;
+// }
+// function getBbsNextId() {
+//     $id = getBbsLastId();
+//     return $id + 1;
+// }
+// function setLastId() {
+//     $id = getBbsNextId();
+//     $fh = openFile(BBS_ID_FILE, 'w');
+//     fwrite($fh, $id);
+//     closeFile($fh);
+// }
 
 function dbConnect() {
     try {
