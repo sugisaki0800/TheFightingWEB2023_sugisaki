@@ -68,26 +68,15 @@ function requestPost($pdo) {
 }
 
 function getBbs($pdo) {
-    $sth = $pdo->prepare("SELECT `comment`, `create_date`, `name` FROM comments JOIN accounts ON comments.account_id = accounts.id");
+    $sth = $pdo->prepare("SELECT `comment`, `create_date`, `name`, comments.`id` FROM comments JOIN accounts ON comments.account_id = accounts.id");
     $sth->execute();
     return $sth->fetchAll();
 }
 
-function deleteBbs($id) {
-    // @todo
-    $fh = openFile(COMMENT_FILE);
-    $bbs = getBbs($fh);
-    closeFile($fh);
-
-    $fh = openFile(COMMENT_FILE, 'w');
-    foreach($bbs as $record) {
-        if($record['id'] != $id) {
-            if(fputcsv($fh, [$record['id'], $record['name'], $record['comment'], $record['date']]) === false) {
-                echo "やばいよ！";
-            }
-        }
-    }
-    closeFile($fh);
+function deleteBbs($pdo) {
+    var_dump($_POST['bbs_id']);
+    $sth = $pdo->prepare("DELETE FROM comments WHERE id = ?");
+    $sth->execute([$_POST['bbs_id']]);
 }
 
 function dbConnect() {

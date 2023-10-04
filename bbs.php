@@ -32,9 +32,6 @@ closeFile($fh);
         }
     </style>
     <body>
-        <pre>
-            <?php var_dump($bbs); ?>
-        </pre>
         <h1>BBS</h1>
 
         <?php if ($_SESSION['account']): ?>
