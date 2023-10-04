@@ -1,10 +1,10 @@
 <?php
 require_once './function.php';
+$pdo = dbConnect();
 
-// var_dump($_POST);
 if (
   $_SERVER["REQUEST_METHOD"] == "POST" &&
   $_POST['bbs_id']){
-  deleteBbs($_POST['bbs_id']);
+  deleteBbs($pdo);
 }
 header('Location: /bbs.php');

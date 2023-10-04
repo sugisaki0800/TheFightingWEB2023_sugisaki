@@ -5,15 +5,16 @@ $result = [
     'comment' => true
 ];
 $fh = openFile(COMMENT_FILE);
+$pdo = dbConnect();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // validation処理
-    $result = validationPost($_POST['name'], $_POST['comment']);
-    if ($result['name'] && $result['comment']) {
+    $result = validationPost($_POST['comment']);
+    if ($result['comment']) {
         // 保存処理
-        requestPost($fh);
+        requestPost($pdo);
     }
 }
-$bbs = getBbs($fh);
+$bbs = getBbs($pdo);
 closeFile($fh);
 
 ?>
@@ -39,11 +40,8 @@ closeFile($fh);
                 <!-- 名前 -->
                 <div>
                     <label for="name">
-                        名前：<input type="text" id="name" name="name" value="<?php echo $_SESSION['account']['name']; ?>" />
+                        名前：<input type="text" id="name" name="name" value="<?php echo $_SESSION['account']['name']; ?>" disabled />
                     </label>
-                    <?php if($result['name'] === false): ?>
-                        <p class="error-text">入力できるのは英数のみ3文字以上32文字以下です</p>
-                    <?php endif; ?>
                 </div>
                 <br>
                 <!-- コメント -->
@@ -86,7 +84,7 @@ closeFile($fh);
                 <div>
                     <p>name: <?php echo $item['name']; ?></p>
                     <p>comment: <?php echo str_replace(PHP_EOL, '<br>', $item['comment']); ?></p>
-                    <p>date time: <?php echo date('Y/m/d H:i:s', $item['date']); ?></p>
+                    <p>date time: <?php echo $item['create_date']; ?></p>
                     <?php if($_SESSION['account']['admin_flag'] === 1): ?>
                         <form action="delete.php" method="POST">
                             <div>

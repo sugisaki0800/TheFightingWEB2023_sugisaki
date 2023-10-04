@@ -1,3 +1,4 @@
-/bbs/comment.txt
-/bbs/account.csv
-/bbs/bbs_id.txt
+/bbs/*.txt
+/bbs/*.csv
+docker/phpmyadmin/sessions/*
+!docker/phpmyadmin/sessions/.empty
