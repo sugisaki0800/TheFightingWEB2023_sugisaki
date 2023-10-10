@@ -32,18 +32,6 @@ function existsAccount($accounts, $id, $password) {
     return false;
 }
 
-function openFile($fileName, $mode = 'a+') {
-    if (!file_exists($fileName)) {
-        touch($fileName);
-        chmod($fileName, 0777);
-    }
-    return fopen($fileName, $mode);
-}
-
-function closeFile($fh) {
-    fclose($fh);
-}
-
 function validationPost($comment) {
     $result = [
         'comment' => true
@@ -74,7 +62,7 @@ function getBbs($pdo) {
 }
 
 function deleteBbs($pdo) {
-    var_dump($_POST['bbs_id']);
+    // var_dump($_POST['bbs_id']);
     $sth = $pdo->prepare("DELETE FROM comments WHERE id = ?");
     $sth->execute([$_POST['bbs_id']]);
 }

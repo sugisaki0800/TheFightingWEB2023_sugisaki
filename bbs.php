@@ -1,12 +1,14 @@
 <?php
+require_once './classes/Models/CommentsModel.php';
 require_once './function.php';
 $result = [
     'name' => true,
     'comment' => true
 ];
-$fh = openFile(COMMENT_FILE);
+// $fh = openFile(COMMENT_FILE);
 $pdo = dbConnect();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $comment = new CommentsModel();
     // validation処理
     $result = validationPost($_POST['comment']);
     if ($result['comment']) {
@@ -15,8 +17,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 $bbs = getBbs($pdo);
-closeFile($fh);
-
+// closeFile($fh);
+var_dump($_SESSION);
 ?>
 <!DOCTYPE html>
 <html>
