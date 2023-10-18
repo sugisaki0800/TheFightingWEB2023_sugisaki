@@ -1,26 +1,25 @@
 <?php
+session_start();
+require_once './classes/Models/AccountsModel.php';
 require_once './classes/Models/CommentsModel.php';
-require_once './function.php';
-$result = [
-    'name' => true,
-    'comment' => true
-];
-// $fh = openFile(COMMENT_FILE);
-$pdo = dbConnect();
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // $comment = new CommentsModel();
-    // $result = $comment->findByCol($_SESSION['account']['id'], 'id');
-    // var_dump($result);
+require_once './classes/Validations/BbsPostValidation.php';
 
+$BbsPostValidation = new BbsPostValidation();
+$CommentsModel = new CommentsModel();
+$AccountsModel = new AccountsModel();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // validation処理
-    $result = validationPost($_POST['comment']);
-    if ($result['comment']) {
+    $BbsPostValidation->validate($_POST['comment']);
+    if ($BbsPostValidation->getResult()['comment']) {
         // 保存処理
-        requestPost($pdo);
+        $CommentsModel->save(['account_id', 'comment'], [$_SESSION['account']['id'], $_POST['comment']]);
     }
 }
-$bbs = getBbs($pdo);
-// closeFile($fh);
+$bbs = $CommentsModel->findAll();
+
+// var_dump($bbs);
+// var_dump($_SESSION['account']['id']);
 ?>
 <!DOCTYPE html>
 <html>
@@ -53,7 +52,7 @@ $bbs = getBbs($pdo);
                     <label for="comment">
                         コメント：<textarea name="comment" id="comment" cols="0" rows="5"></textarea>
                     </label>
-                    <?php if($result['comment'] === false): ?>
+                    <?php if($BbsPostValidation->getResult()['comment'] === false): ?>
                         <p class="error-text">入力は1024文字までです。</p>
                     <?php endif; ?>
                 </div>

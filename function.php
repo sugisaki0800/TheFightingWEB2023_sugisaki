@@ -31,34 +31,34 @@ function checkDeplicateAccount($pdo, $name) {
 //     return false;
 // }
 
-function validationPost($comment) {
-    $result = [
-        'comment' => true
-    ];
+// function validationPost($comment) {
+//     $result = [
+//         'comment' => true
+//     ];
 
-    // comment -> 1024文字(2のn乗です) / 許容する文字に制限は設けない
-    if (mb_strlen($comment) > 1024) {
-        $result['comment'] = false;
-    }
+//     // comment -> 1024文字(2のn乗です) / 許容する文字に制限は設けない
+//     if (mb_strlen($comment) > 1024) {
+//         $result['comment'] = false;
+//     }
 
-    return $result;
-}
+//     return $result;
+// }
 
-function saveAccount($pdo, $name, $password, $is_admin) {
-    $sth = $pdo->prepare("INSERT INTO `accounts` (`name`, `password`, admin_flag) VALUE(?, ?, ?)");
-    return $sth->execute([$name, password_hash($password, PASSWORD_BCRYPT), $is_admin ? 1 : 0]);
-}
+// function saveAccount($pdo, $name, $password, $is_admin) {
+//     $sth = $pdo->prepare("INSERT INTO `accounts` (`name`, `password`, admin_flag) VALUE(?, ?, ?)");
+//     return $sth->execute([$name, password_hash($password, PASSWORD_BCRYPT), $is_admin ? 1 : 0]);
+// }
 
-function requestPost($pdo) {
-    $sth = $pdo->prepare("INSERT INTO `comments` (`account_id`, `comment`) VALUE(?, ?)");
-    return $sth->execute([$_SESSION['account']['id'], $_POST['comment']]);
-}
+// function requestPost($pdo) {
+//     $sth = $pdo->prepare("INSERT INTO `comments` (`account_id`, `comment`) VALUE(?, ?)");
+//     return $sth->execute([$_SESSION['account']['id'], $_POST['comment']]);
+// }
 
-function getBbs($pdo) {
-    $sth = $pdo->prepare("SELECT `comment`, `create_date`, `name`, comments.`id` FROM comments JOIN accounts ON comments.account_id = accounts.id");
-    $sth->execute();
-    return $sth->fetchAll();
-}
+// function getBbs($pdo) {
+//     $sth = $pdo->prepare("SELECT `comment`, `create_date`, `name`, comments.`id` FROM comments JOIN accounts ON comments.account_id = accounts.id");
+//     $sth->execute();
+//     return $sth->fetchAll();
+// }
 
 function deleteBbs($pdo) {
     // var_dump($_POST['bbs_id']);
