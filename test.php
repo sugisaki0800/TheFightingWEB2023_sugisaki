@@ -9,12 +9,12 @@ $comment = new CommentsModel();
 
 // $a = $account->findByCol(`admin`, `name`);
 // $a = $account->findByCol(1);
-$a = $account->findByCol("admin", 'name');
-var_dump($a);
+// $a = $account->findByCol("admin", 'name');
+// var_dump($a);
 
 // $c = $comment->findByCol(2);
-// $c = $comment->findByCol(5);
-// var_dump($c);
+$c = $comment->findByCol(5);
+var_dump($c);
 
 // $d = $account->findAll();
 // $d = $comment->findAll();

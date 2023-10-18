@@ -1,6 +1,5 @@
 <?php
 
-define('COMMENT_FILE', './bbs/comment.txt');
 session_start();
 
 function checkLogin($pdo, $id, $password) {
@@ -20,17 +19,17 @@ function checkDeplicateAccount($pdo, $name) {
     $result = $sth->fetchAll();
     return count($result) === 0;
 }
-function existsAccount($accounts, $id, $password) {
-    // 配列データをloopして、一致する情報があるかを判定する
-    foreach($accounts as $account) {
-        if ($account['id'] === $id && password_verify($password, $account['pass'])) {
-            return true;
-        }
-    }
+// function existsAccount($accounts, $id, $password) {
+//     // 配列データをloopして、一致する情報があるかを判定する
+//     foreach($accounts as $account) {
+//         if ($account['id'] === $id && password_verify($password, $account['pass'])) {
+//             return true;
+//         }
+//     }
 
-    // 失敗ならfalse
-    return false;
-}
+//     // 失敗ならfalse
+//     return false;
+// }
 
 function validationPost($comment) {
     $result = [

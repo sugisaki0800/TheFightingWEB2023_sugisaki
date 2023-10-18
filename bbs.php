@@ -8,7 +8,10 @@ $result = [
 // $fh = openFile(COMMENT_FILE);
 $pdo = dbConnect();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $comment = new CommentsModel();
+    // $comment = new CommentsModel();
+    // $result = $comment->findByCol($_SESSION['account']['id'], 'id');
+    // var_dump($result);
+
     // validation処理
     $result = validationPost($_POST['comment']);
     if ($result['comment']) {
@@ -18,7 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 $bbs = getBbs($pdo);
 // closeFile($fh);
-var_dump($_SESSION);
 ?>
 <!DOCTYPE html>
 <html>
@@ -94,6 +96,12 @@ var_dump($_SESSION);
                                 <input type="hidden" name="bbs_id" value="<?php echo $item['id']; ?>" />
                             </div>
 
+                        </form>
+                    <?php endif; ?>
+                    <?php if($_SESSION['account']['name'] === $item['name']): ?>
+                        <form action="update.php" method="GET">
+                            <input type="submit" value="更新する">
+                            <input type="hidden" name="bbs_id" value="<?php echo $item['id']; ?>">
                         </form>
                     <?php endif; ?>
                 </div>
