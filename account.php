@@ -1,4 +1,6 @@
 <?php
+require_once './classes/Models/AccountsModel.php';
+
 require_once './function.php';
 // var_dump($_POST);
 $result = [
@@ -6,12 +8,19 @@ $result = [
   'name' => true
 ];
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
-    $pdo = dbConnect();
-  $result['name'] = checkDeplicateAccount($pdo, $_POST['name']);
-  if($result['name']) {
-    saveAccount($pdo, $_POST['name'], $_POST['password'], !empty($_POST['is_admin']));
-    header('Location: /bbs.php');
-  }
+    $account = new AccountsModel();
+    $result = $account->findByCol($_POST['name'], 'name');
+    if ($result['name'] === $_POST['name']) {
+        $result['name'] = false;
+    } else {
+        $account->save();
+    }
+    // $pdo = dbConnect();
+//   $result['name'] = checkDeplicateAccount($pdo, $_POST['name']);
+//   if($result['name']) {
+//     saveAccount($pdo, $_POST['name'], $_POST['password'], !empty($_POST['is_admin']));
+//     header('Location: /bbs.php');
+//   }
 }
 ?>
 <!DOCTYPE html>
@@ -34,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <label for="name">
                     ID:<input type="text" id="name" name="name" value="">
                 </label>
-                <?php if($result['id'] === false): ?>
+                <?php if($result['name'] === false): ?>
                   <p class="error-text">重複したidが既に存在しています</p>
                 <?php endif; ?>
             </div>
