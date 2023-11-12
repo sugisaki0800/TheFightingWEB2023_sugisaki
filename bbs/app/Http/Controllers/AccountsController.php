@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comments;
+use App\Models\Accounts;
 use Illuminate\Http\Request;
 
-class CommentsController extends Controller
+class AccountsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -13,10 +13,6 @@ class CommentsController extends Controller
     public function index()
     {
         //
-        // $commentAll = Comments::all();
-        // return view('comments')->with('comments', $commentAll);
-        $Comments = Comments::all();
-        return view('comments', ['Comments' => $Comments]);
     }
 
     /**
@@ -38,7 +34,7 @@ class CommentsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Comments $comments)
+    public function show(Accounts $accounts)
     {
         //
     }
@@ -46,7 +42,7 @@ class CommentsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Comments $comments)
+    public function edit(Accounts $accounts)
     {
         //
     }
@@ -54,7 +50,7 @@ class CommentsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Comments $comments)
+    public function update(Request $request, Accounts $accounts)
     {
         //
     }
@@ -62,7 +58,7 @@ class CommentsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Comments $comments)
+    public function destroy(Accounts $accounts)
     {
         //
     }

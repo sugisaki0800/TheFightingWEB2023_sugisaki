@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>comments</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -17,12 +17,14 @@
     </head>
     <body class="antialiased">
         <h1>いい感じのBBSだよ！</h1>
-        @foreach ($comments as $comment)
+        @foreach ($Comments as $Comment)
+            <hr>
             <div>
-                <p>{{ $comment->id }}</p>
-                <p>{{ $comment->comment }}</p>
-                <p>{{ $comment->create_date }}</p>
+                <p>account id: {{ $Comment->account_id }}</p>
+                <p>{{ $Comment->comment }}</p>
+                <p>created_at: {{ $Comment->created_at }}</p>
             </div>
         @endforeach
+        <hr>
     </body>
 </html>

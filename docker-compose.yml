@@ -2,13 +2,15 @@ version: '3'
 services:
   php:
     image: php__image
-    container_name: php
+    container_name: kb-php
     build:
       context: .
-      dockerfile: ./Dockerfile_php
+      # dockerfile: ./Dockerfile_php
+      dockerfile: ./docker/Dockerfile_php
 
     ports:
-      - 80:9000
+      # - 80:9000
+      - 9000:9000
 
     environment:
       - DB_HOST=db
@@ -19,7 +21,7 @@ services:
 
     volumes:
       # - /opt/src/sample:/var/www/public
-      - /opt/src/sample/bbs:/var/www/html
+      - ./bbs:/var/www/public
 
     tty: true
     depends_on:
@@ -33,7 +35,7 @@ services:
 
   db:
     image: mysql:5.6
-    container_name: mysql
+    container_name: kb-mysql
     ports:
       - '3306:3306'
     volumes_from:
@@ -46,7 +48,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
+    container_name: kb-phpmyadmin
     depends_on:
       - db
     environment:

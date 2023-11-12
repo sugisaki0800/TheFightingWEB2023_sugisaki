@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('account_id')->constrained('accounts');
-            $table->text('comments')->nullable();
+            $table->text('comment')->nullable();
             $table->timestamps();
         });
     }
