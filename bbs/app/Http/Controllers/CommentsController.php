@@ -15,8 +15,15 @@ class CommentsController extends Controller
         //
         // $commentAll = Comments::all();
         // return view('comments')->with('comments', $commentAll);
-        $Comments = Comments::all();
-        return view('comments', ['Comments' => $Comments]);
+
+        // $Comments = Comments::all();
+        // return view('comments', ['Comments' => $Comments]);
+        $Comments = Comments::query()
+            ->join('accounts', 'account_id', '=', 'accounts.id')
+            ->select('name', 'comment', 'comments.created_at as create_date')
+            ->get();
+        // return view('comments', ['Comments' => $Comments]);
+        return view('comments')->with('Comments', $Comments);
     }
 
     /**

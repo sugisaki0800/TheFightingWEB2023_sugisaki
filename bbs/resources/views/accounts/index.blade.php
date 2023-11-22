@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>comments</title>
+        <title>accounts</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -16,26 +16,26 @@
         </style> -->
     </head>
     <body class="antialiased">
-        <h1>いい感じのBBSだよ！</h1>
+        <h1>ログインをするよ</h1>
+        <!-- <hr> -->
         <div>
-            name: <input type="text" name="name" disabled="diaabled" value="" />
+            <form action="" method="post">
+                @csrf
+                <!-- <label for="name">名前</label> -->
+                <div>
+                    name: <input type="text" name="name" id="name" />
+                </div>
+                <!-- <br> -->
+                <!-- <label for="password">パスワード</label> -->
+                <div>
+                    password: <input type="password" name="password" id="password" />
+                </div>
+                <div>
+                    <!-- <button type="submit">送信</button> -->
+                    <input type="submit" value="ログイン" />
+                </div>
+            </form>
         </div>
-        <div>
-            コメント: <textarea name="comment" id="comment" cols="30" rows="10"></textarea>
-        </div>
-        <div>
-            <input type="submit" value="投稿" />
-            <input type="submit" value="ログアウト" />
-        </div>
-        @foreach ($Comments as $Comment)
-            <hr>
-            <div class=comment">
-                <!-- <p>account id: {{ $Comment->account_id }}</p> -->
-                <p>name: {{ $Comment->name }}</p>
-                <p>comment: {{ $Comment->comment }}</p>
-                <p>created date: {{ $Comment->create_date }}</p>
-            </div>
-        @endforeach
-        <hr>
+        <!-- <hr> -->
     </body>
 </html>
